@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyChat | Profile</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="profile-page">
+    <header class="profile-header">
+        <a href="./chat.html" class="ghost-link">Back to chat</a>
+        <div id="profileHeaderMeta" class="profile-header-meta">
+            <img id="profileHeaderAvatar" src="./images/default-avatar.svg" alt="Profile avatar">
+            <div>
+                <p class="eyebrow">User profile</p>
+                <h1 id="profileHeaderName">Profile settings</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="profile-layout">
+        <section class="profile-card">
+            <img id="profilePreview" class="profile-preview" src="./images/default-avatar.svg" alt="Profile preview">
+            <h2 id="profileNameCard">Your profile</h2>
+            <p id="profileCreatedAt" class="muted-copy">Saved information appears here.</p>
+
+            <label class="upload-field">
+                <span>Profile image</span>
+                <input id="profilePhotoInput" type="file" accept="image/*">
+            </label>
+        </section>
+
+        <section class="profile-form-panel">
+            <div id="profileStatus" class="status-banner hidden"></div>
+
+            <form id="profileForm" class="profile-form">
+                <div class="field-row">
+                    <label class="field">
+                        <span>Full name</span>
+                        <input type="text" name="full_name" placeholder="Full name">
+                    </label>
+                    <label class="field">
+                        <span>Username</span>
+                        <input type="text" name="username" placeholder="Username" required>
+                    </label>
+                </div>
+
+                <div class="field-row">
+                    <label class="field">
+                        <span>Email</span>
+                        <input type="email" name="email" placeholder="Email address" required>
+                    </label>
+                    <label class="field">
+                        <span>Member since</span>
+                        <input id="createdAtInput" type="text" disabled>
+                    </label>
+                </div>
+
+                <label class="field">
+                    <span>Bio</span>
+                    <textarea name="bio" rows="4" placeholder="Share the user's interests, background, or goals"></textarea>
+                </label>
+
+                <section class="language-picker">
+                    <div class="section-heading">
+                        <div>
+                            <h3>Default languages</h3>
+                            <p>Keep at least two selected so voice and text replies stay personalized.</p>
+                        </div>
+                        <strong id="profileLanguageCount" class="pill">0 selected</strong>
+                    </div>
+                    <div id="profileLanguages" class="language-grid"></div>
+                </section>
+
+                <div class="form-actions">
+                    <button type="submit" class="primary-button">Save profile</button>
+                    <a href="./chat.html" class="secondary-button link-button">Return to chat</a>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script src="./js/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyChat | Welcome</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <section class="auth-hero">
+            <span class="eyebrow">Private multilingual AI workspace</span>
+            <h1>Build conversations that remember the user, speak naturally, and stay personal.</h1>
+            <p class="lead">
+                Register first, pick your default languages, and continue every chat with saved memory,
+                profile context, voice input, and voice playback.
+            </p>
+
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <h2>Talk or type</h2>
+                    <p>Use browser voice recognition, text prompts, and multilingual replies in one chat flow.</p>
+                </article>
+                <article class="feature-card">
+                    <h2>Profile-aware answers</h2>
+                    <p>Saved bio, language choices, and previous chats help the assistant respond more personally.</p>
+                </article>
+                <article class="feature-card">
+                    <h2>History like ChatGPT</h2>
+                    <p>Every conversation is stored so users can return to old threads from the sidebar at any time.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="auth-panel">
+            <div class="brand-row">
+                <div>
+                    <p class="brand-kicker">PolyChat</p>
+                    <h2>Your AI chatbot</h2>
+                </div>
+                <div class="auth-toggle">
+                    <button class="toggle-button is-active" data-target="login">Login</button>
+                    <button class="toggle-button" data-target="register">Register</button>
+                </div>
+            </div>
+
+            <div id="authStatus" class="status-banner hidden"></div>
+
+            <form id="loginForm" class="auth-form is-active">
+                <label class="field">
+                    <span>Username or email</span>
+                    <input type="text" name="identifier" placeholder="Enter username or email" required>
+                </label>
+                <label class="field">
+                    <span>Password</span>
+                    <input type="password" name="password" placeholder="Enter password" required>
+                </label>
+                <button type="submit" class="primary-button wide">Enter chat</button>
+            </form>
+
+            <form id="registerForm" class="auth-form">
+                <div class="field-row">
+                    <label class="field">
+                        <span>Full name</span>
+                        <input type="text" name="full_name" placeholder="Your full name">
+                    </label>
+                    <label class="field">
+                        <span>Username</span>
+                        <input type="text" name="username" placeholder="Choose username" required>
+                    </label>
+                </div>
+
+                <div class="field-row">
+                    <label class="field">
+                        <span>Email</span>
+                        <input type="email" name="email" placeholder="name@example.com" required>
+                    </label>
+                    <label class="field">
+                        <span>Password</span>
+                        <input type="password" name="password" placeholder="Create password" required>
+                    </label>
+                </div>
+
+                <label class="field">
+                    <span>Bio</span>
+                    <textarea name="bio" rows="3" placeholder="Tell the chatbot a little about the user"></textarea>
+                </label>
+
+                <section class="language-picker">
+                    <div class="section-heading">
+                        <div>
+                            <h3>Default languages</h3>
+                            <p>Select at least two languages for the user profile.</p>
+                        </div>
+                        <strong id="languageCount" class="pill">0 selected</strong>
+                    </div>
+                    <div id="registerLanguages" class="language-grid"></div>
+                </section>
+
+                <button type="submit" class="primary-button wide">Create account</button>
+            </form>
+        </section>
+    </main>
+
+    <script src="./js/auth.js"></script>
+</body>
+</html>

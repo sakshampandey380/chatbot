@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyChat | Chat</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="chat-page">
+    <div class="chat-shell">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div>
+                    <p class="brand-kicker">PolyChat</p>
+                    <h1>Conversations</h1>
+                </div>
+                <button id="newChatButton" class="primary-button small">New chat</button>
+            </div>
+
+            <label class="search-field">
+                <span class="sr-only">Search conversations</span>
+                <input id="conversationSearch" type="search" placeholder="Search your chat history">
+            </label>
+
+            <div id="conversationList" class="conversation-list"></div>
+        </aside>
+
+        <main class="chat-main">
+            <header class="chat-header">
+                <div>
+                    <p class="eyebrow">Memory-aware multilingual assistant</p>
+                    <h2 id="chatTitle">Start a new conversation</h2>
+                </div>
+
+                <div class="header-actions">
+                    <div class="language-inline">
+                        <label for="languageSelect">Reply language</label>
+                        <select id="languageSelect"></select>
+                    </div>
+
+                    <div class="profile-menu-wrapper">
+                        <button id="profileMenuButton" class="profile-trigger">
+                            <img id="headerAvatar" src="./images/default-avatar.svg" alt="Profile avatar">
+                            <span id="headerName">Profile</span>
+                        </button>
+
+                        <div id="profileDropdown" class="profile-dropdown hidden">
+                            <a href="./profile.html">View profile</a>
+                            <button id="logoutButton" type="button">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div id="chatStatus" class="status-banner hidden"></div>
+
+            <section id="messagesPanel" class="messages-panel">
+                <div id="emptyState" class="empty-state">
+                    <h3>Ready when you are</h3>
+                    <p>
+                        Type or speak in any language. The chatbot will save each conversation and use the
+                        user's profile plus earlier chats for more relevant replies.
+                    </p>
+                </div>
+            </section>
+
+            <form id="composerForm" class="composer">
+                <textarea id="messageInput" rows="1" placeholder="Message PolyChat"></textarea>
+                <div class="composer-actions">
+                    <button id="voiceButton" type="button" class="secondary-button">Voice input</button>
+                    <button id="speakerButton" type="button" class="secondary-button">Voice off</button>
+                    <button id="sendButton" type="submit" class="primary-button">Send</button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script src="./js/chat.js"></script>
+</body>
+</html>
