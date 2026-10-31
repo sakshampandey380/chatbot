@@ -2,14 +2,50 @@ from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from backend.config import settings
+from backend.config import ROOT_DIR, settings
 
 
-engine = create_engine(
-    settings.database_url,
-    pool_pre_ping=True,
-    future=True,
-)
+def _build_engine():
+    try:
+        url = make_url(settings.database_url)
+        if url.database and url.get_backend_name().startswith("mysql"):
+            admin_url = url.set(database=None)
+            admin_engine = create_engine(
+                admin_url,
+                pool_pre_ping=True,
+                future=True,
+                isolation_level="AUTOCOMMIT",
+                connect_args={"connect_timeout": 3},
+            )
+            with admin_engine.connect() as connection:
+                connection.execute(
+                    text(
+                        f"CREATE DATABASE IF NOT EXISTS `{url.database}` "
+                        "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+                    )
+                )
+            admin_engine.dispose()
+
+        primary_engine = create_engine(
+            settings.database_url,
+            pool_pre_ping=True,
+            future=True,
+        )
+        with primary_engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return primary_engine
+    except Exception as exc:
+        sqlite_path = ROOT_DIR / "database" / "chatbot_fallback.db"
+        sqlite_path.parent.mkdir(parents=True, exist_ok=True)
+        print(f"[PolyChat DB] MySQL unavailable ({exc}); falling back to SQLite at {sqlite_path}")
+        return create_engine(
+            f"sqlite:///{sqlite_path.as_posix()}",
+            connect_args={"check_same_thread": False},
+            future=True,
+        )
+
+
+engine = _build_engine()
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
 Base = declarative_base()
 
@@ -23,23 +59,12 @@ def get_db():
 
 
 def ensure_database_exists() -> None:
-    url = make_url(settings.database_url)
-    if not url.database or not url.get_backend_name().startswith("mysql"):
-        return
-
-    admin_url = url.set(database=None)
-    admin_engine = create_engine(admin_url, pool_pre_ping=True, future=True, isolation_level="AUTOCOMMIT")
-    with admin_engine.connect() as connection:
-        connection.execute(
-            text(
-                f"CREATE DATABASE IF NOT EXISTS `{url.database}` "
-                "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
-            )
-        )
-    admin_engine.dispose()
+    pass
 
 
 def ensure_schema_compatibility() -> None:
+    if not engine.dialect.name.startswith("mysql"):
+        return
     inspector = inspect(engine)
     if not inspector.has_table("users"):
         return
@@ -111,6 +136,6 @@ def ensure_schema_compatibility() -> None:
 def init_db() -> None:
     from backend.database import models  # noqa: F401
 
-    ensure_database_exists()
     Base.metadata.create_all(bind=engine)
     ensure_schema_compatibility()
+

@@ -1,6 +1,11 @@
 import os
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover
+    load_dotenv = None
+
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = ROOT_DIR / "backend"
@@ -8,10 +13,14 @@ FRONTEND_DIR = ROOT_DIR / "frontend"
 UPLOADS_DIR = BACKEND_DIR / "uploads" / "profile_pics"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
+if load_dotenv is not None:
+    load_dotenv(ROOT_DIR / ".env")
+    load_dotenv(BACKEND_DIR / ".env")
+
 
 class Settings:
-    app_name = os.getenv("APP_NAME", "PolyChat")
-    secret_key = os.getenv("SECRET_KEY", "change-me-before-production")
+    app_name = os.getenv("APP_NAME", "PolyChat 3D")
+    secret_key = os.getenv("SECRET_KEY", "polychat-3d-secret-key-change-in-production")
     algorithm = os.getenv("JWT_ALGORITHM", "HS256")
     access_token_expire_minutes = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
 
@@ -26,8 +35,11 @@ class Settings:
     )
 
     openai_api_key = os.getenv("OPENAI_API_KEY", "")
-    openai_model = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+    openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    gemini_api_key = os.getenv("GEMINI_API_KEY", "")
+    gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     cors_origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "*").split(",") if origin.strip()]
 
 
 settings = Settings()
+

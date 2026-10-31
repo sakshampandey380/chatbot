@@ -42,8 +42,10 @@ def health():
 
 
 @app.get("/")
+@app.get("/index.html")
 def index_page():
     return FileResponse(FRONTEND_DIR / "index.html")
+
 
 
 @app.get("/chat.html")

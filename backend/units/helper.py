@@ -97,11 +97,14 @@ def language_label(code: str | None) -> str:
 
 
 def build_conversation_title(message: str) -> str:
-    words = re.findall(r"[A-Za-z0-9']+", message)
+    cleaned = re.sub(r"[^\w\s\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0A80-\u0AFF\u0B80-\u0BFF\u0C00-\u0C7F\u0C80-\u0CFF\u0D00-\u0D7F'-]", " ", message, flags=re.UNICODE)
+    words = [w for w in cleaned.split() if w.strip()]
     if not words:
-        return "New conversation"
+        fallback = message.strip()
+        return (fallback[:45] + "...") if len(fallback) > 45 else (fallback or "New conversation")
     title = " ".join(words[:7]).strip()
     return title[:60] + ("..." if len(title) > 60 else "")
+
 
 
 def public_profile_pic(path: str | None) -> str | None:

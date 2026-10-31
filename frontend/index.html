@@ -3,31 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PolyChat | Welcome</title>
+    <title>PolyChat 3D | Welcome</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body class="auth-page">
     <main class="auth-shell">
         <section class="auth-hero">
-            <span class="eyebrow">Private multilingual AI workspace</span>
-            <h1>Build conversations that remember the user, speak naturally, and stay personal.</h1>
-            <p class="lead">
-                Register first, pick your default languages, and continue every chat with saved memory,
-                profile context, voice input, and voice playback.
-            </p>
+            <div>
+                <span class="eyebrow">✨ Next-Gen 3D Multilingual AI Workspace</span>
+                <h1>Conversations that remember you, speak naturally, and come alive in 3D.</h1>
+                <p class="lead">
+                    Register first, choose your favorite languages, and enjoy every chat with long-term personal memory,
+                    profile awareness, voice input, and expressive voice playback.
+                </p>
+
+                <div class="hero-3d-badge-row">
+                    <span class="hero-3d-badge">🌐 48+ Global Languages</span>
+                    <span class="hero-3d-badge">🧠 Long-Term User Memory</span>
+                    <span class="hero-3d-badge">🎙️ Live Voice Input &amp; Speech</span>
+                </div>
+            </div>
 
             <div class="feature-grid">
                 <article class="feature-card">
-                    <h2>Talk or type</h2>
-                    <p>Use browser voice recognition, text prompts, and multilingual replies in one chat flow.</p>
+                    <div class="feature-icon">🎙️</div>
+                    <h2>Talk or Type</h2>
+                    <p>Use browser voice recognition, instant text prompts, and natural multilingual replies in one seamless flow.</p>
                 </article>
                 <article class="feature-card">
-                    <h2>Profile-aware answers</h2>
-                    <p>Saved bio, language choices, and previous chats help the assistant respond more personally.</p>
+                    <div class="feature-icon">🧠</div>
+                    <h2>Profile-Aware AI</h2>
+                    <p>Saved bio, language choices, and learned memories help the assistant respond personally every time.</p>
                 </article>
                 <article class="feature-card">
-                    <h2>History like ChatGPT</h2>
-                    <p>Every conversation is stored so users can return to old threads from the sidebar at any time.</p>
+                    <div class="feature-icon">💬</div>
+                    <h2>Saved Chat Threads</h2>
+                    <p>Every conversation is stored securely so you can search, revisit, or manage past threads anytime.</p>
                 </article>
             </div>
         </section>
@@ -35,12 +46,12 @@
         <section class="auth-panel">
             <div class="brand-row">
                 <div>
-                    <p class="brand-kicker">PolyChat</p>
-                    <h2>Your AI chatbot</h2>
+                    <p class="brand-kicker">PolyChat 3D</p>
+                    <h2>Your Personal AI</h2>
                 </div>
                 <div class="auth-toggle">
-                    <button class="toggle-button is-active" data-target="login">Login</button>
-                    <button class="toggle-button" data-target="register">Register</button>
+                    <button type="button" class="toggle-button is-active" data-target="login">Login</button>
+                    <button type="button" class="toggle-button" data-target="register">Register</button>
                 </div>
             </div>
 
@@ -48,60 +59,61 @@
 
             <form id="loginForm" class="auth-form is-active">
                 <label class="field">
-                    <span>Username or email</span>
-                    <input type="text" name="identifier" placeholder="Enter username or email" required>
+                    <span>Username or Email</span>
+                    <input type="text" name="identifier" placeholder="Enter username or email" autocomplete="username" required>
                 </label>
                 <label class="field">
                     <span>Password</span>
-                    <input type="password" name="password" placeholder="Enter password" required>
+                    <input type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
                 </label>
-                <button type="submit" class="primary-button wide">Enter chat</button>
+                <button type="submit" id="loginSubmitBtn" class="primary-button wide">🚀 Enter 3D Chat Workspace</button>
             </form>
 
             <form id="registerForm" class="auth-form">
                 <div class="field-row">
                     <label class="field">
-                        <span>Full name</span>
-                        <input type="text" name="full_name" placeholder="Your full name">
+                        <span>Full Name</span>
+                        <input type="text" name="full_name" placeholder="Your full name" autocomplete="name">
                     </label>
                     <label class="field">
                         <span>Username</span>
-                        <input type="text" name="username" placeholder="Choose username" required>
+                        <input type="text" name="username" placeholder="Choose username" autocomplete="username" required>
                     </label>
                 </div>
 
                 <div class="field-row">
                     <label class="field">
                         <span>Email</span>
-                        <input type="email" name="email" placeholder="name@example.com" required>
+                        <input type="email" name="email" placeholder="name@example.com" autocomplete="email" required>
                     </label>
                     <label class="field">
                         <span>Password</span>
-                        <input type="password" name="password" placeholder="Create password" required>
+                        <input type="password" name="password" placeholder="Min. 6 characters" autocomplete="new-password" minlength="6" required>
                     </label>
                 </div>
 
                 <label class="field">
-                    <span>Bio</span>
-                    <textarea name="bio" rows="3" placeholder="Tell the chatbot a little about the user"></textarea>
+                    <span>About You (Bio)</span>
+                    <textarea name="bio" rows="2" placeholder="Tell PolyChat about your interests, role, or goals..."></textarea>
                 </label>
 
                 <section class="language-picker">
                     <div class="section-heading">
                         <div>
-                            <h3>Default languages</h3>
-                            <p>Select at least two languages for the user profile.</p>
+                            <h3>Default Languages</h3>
+                            <p>Select at least 2 languages for your profile.</p>
                         </div>
                         <strong id="languageCount" class="pill">0 selected</strong>
                     </div>
                     <div id="registerLanguages" class="language-grid"></div>
                 </section>
 
-                <button type="submit" class="primary-button wide">Create account</button>
+                <button type="submit" id="registerSubmitBtn" class="primary-button wide">✨ Create Account &amp; Start</button>
             </form>
         </section>
     </main>
 
+    <script src="./js/bg3d.js"></script>
     <script src="./js/auth.js"></script>
 </body>
 </html>

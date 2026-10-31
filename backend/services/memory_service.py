@@ -8,12 +8,30 @@ from backend.units.helper import language_label, parse_languages
 
 
 MEMORY_PATTERNS = {
-    "name": re.compile(r"\bmy name is ([^.,!?]{2,60})", re.IGNORECASE),
-    "location": re.compile(r"\bi live in ([^.,!?]{2,80})", re.IGNORECASE),
-    "work": re.compile(r"\bi work (?:as|at) ([^.,!?]{2,80})", re.IGNORECASE),
-    "study": re.compile(r"\bi study ([^.,!?]{2,80})", re.IGNORECASE),
-    "likes": re.compile(r"\bi (?:like|love|enjoy) ([^.,!?]{2,100})", re.IGNORECASE),
-    "goal": re.compile(r"\bmy goal is to ([^.,!?]{2,100})", re.IGNORECASE),
+    "name": [
+        re.compile(r"\b(?:my name is|i'm called|call me)\s+([^.,!?\n]{2,50})", re.IGNORECASE),
+        re.compile(r"(?:मेरा नाम|mera naam)\s+([^.,!?\n]{2,50}?)(?:\s+है|\s+hai|$)", re.IGNORECASE),
+    ],
+    "location": [
+        re.compile(r"\b(?:i live in|i am from|i'm from)\s+([^.,!?\n]{2,70})", re.IGNORECASE),
+        re.compile(r"(?:मैं|main)\s+([^.,!?\n]{2,60}?)\s+(?:में रहता|में रहती|से हूँ|se hu|me rehta)", re.IGNORECASE),
+    ],
+    "work": [
+        re.compile(r"\b(?:i work (?:as|at)|my job is|i am a)\s+([^.,!?\n]{2,70})", re.IGNORECASE),
+        re.compile(r"(?:मैं एक|main ek)\s+([^.,!?\n]{2,60}?)\s+(?:हूँ|हूं|hu)", re.IGNORECASE),
+    ],
+    "study": [
+        re.compile(r"\b(?:i study|i am studying)\s+([^.,!?\n]{2,70})", re.IGNORECASE),
+        re.compile(r"(?:मैं|main)\s+([^.,!?\n]{2,60}?)\s+(?:पढ़ता|पढ़ती|padhta|padhti)", re.IGNORECASE),
+    ],
+    "likes": [
+        re.compile(r"\bi (?:like|love|enjoy)\s+([^.,!?\n]{2,90})", re.IGNORECASE),
+        re.compile(r"(?:मुझे|mujhe)\s+([^.,!?\n]{2,80}?)\s+(?:पसंद है|pasand hai)", re.IGNORECASE),
+    ],
+    "goal": [
+        re.compile(r"\b(?:my goal is to|my goal is|i want to build)\s+([^.,!?\n]{2,90})", re.IGNORECASE),
+        re.compile(r"(?:मेरा लक्ष्य|mera lakshya)\s+([^.,!?\n]{2,80})", re.IGNORECASE),
+    ],
 }
 
 
@@ -32,14 +50,18 @@ def learn_from_message(db: Session, user_id: int, message: str) -> None:
     text = message.strip()
     if not text:
         return
-    for memory_key, pattern in MEMORY_PATTERNS.items():
-        match = pattern.search(text)
-        if match:
-            upsert_memory(db, user_id, memory_key, match.group(1).strip())
+    for memory_key, patterns in MEMORY_PATTERNS.items():
+        for pattern in patterns:
+            match = pattern.search(text)
+            if match:
+                val = match.group(1).strip()
+                if val:
+                    upsert_memory(db, user_id, memory_key, val)
+                break
 
 
 def search_past_context(db: Session, user_id: int, query: str, limit: int = 5) -> list[str]:
-    terms = [term for term in re.findall(r"[a-zA-Z0-9']+", query.lower()) if len(term) > 3]
+    terms = [term for term in re.findall(r"[\w\u0900-\u097F']+", query.lower(), flags=re.UNICODE) if len(term) > 2]
     snippets: list[str] = []
 
     memories = db.scalars(
@@ -66,6 +88,7 @@ def search_past_context(db: Session, user_id: int, query: str, limit: int = 5) -
         if len(snippets) >= limit:
             break
     return snippets
+
 
 
 def build_user_context(db: Session, user: User, current_message: str) -> dict[str, list[str]]:

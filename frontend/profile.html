@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PolyChat | Profile</title>
+    <title>PolyChat 3D | Profile Settings</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body class="profile-page">
     <header class="profile-header">
-        <a href="./chat.html" class="ghost-link">Back to chat</a>
+        <a href="./chat.html" class="ghost-link">← Back to 3D Chat</a>
         <div id="profileHeaderMeta" class="profile-header-meta">
             <img id="profileHeaderAvatar" src="./images/default-avatar.svg" alt="Profile avatar">
             <div>
-                <p class="eyebrow">User profile</p>
-                <h1 id="profileHeaderName">Profile settings</h1>
+                <p class="eyebrow">✨ Personalization &amp; Identity</p>
+                <h1 id="profileHeaderName">Profile Settings</h1>
             </div>
         </div>
     </header>
@@ -21,11 +21,11 @@
     <main class="profile-layout">
         <section class="profile-card">
             <img id="profilePreview" class="profile-preview" src="./images/default-avatar.svg" alt="Profile preview">
-            <h2 id="profileNameCard">Your profile</h2>
+            <h2 id="profileNameCard">Your Profile</h2>
             <p id="profileCreatedAt" class="muted-copy">Saved information appears here.</p>
 
-            <label class="upload-field">
-                <span>Profile image</span>
+            <label class="upload-field" style="width:100%;margin-top:12px;">
+                <span>📸 Update Profile Picture</span>
                 <input id="profilePhotoInput" type="file" accept="image/*">
             </label>
         </section>
@@ -36,7 +36,7 @@
             <form id="profileForm" class="profile-form">
                 <div class="field-row">
                     <label class="field">
-                        <span>Full name</span>
+                        <span>Full Name</span>
                         <input type="text" name="full_name" placeholder="Full name">
                     </label>
                     <label class="field">
@@ -47,25 +47,25 @@
 
                 <div class="field-row">
                     <label class="field">
-                        <span>Email</span>
+                        <span>Email Address</span>
                         <input type="email" name="email" placeholder="Email address" required>
                     </label>
                     <label class="field">
-                        <span>Member since</span>
+                        <span>Member Since</span>
                         <input id="createdAtInput" type="text" disabled>
                     </label>
                 </div>
 
                 <label class="field">
-                    <span>Bio</span>
-                    <textarea name="bio" rows="4" placeholder="Share the user's interests, background, or goals"></textarea>
+                    <span>About You (Bio &amp; Context for AI)</span>
+                    <textarea name="bio" rows="4" placeholder="Share your interests, profession, background, or learning goals..."></textarea>
                 </label>
 
                 <section class="language-picker">
                     <div class="section-heading">
                         <div>
-                            <h3>Default languages</h3>
-                            <p>Keep at least two selected so voice and text replies stay personalized.</p>
+                            <h3>Default Languages</h3>
+                            <p>Keep at least 2 languages selected so voice &amp; text replies stay personalized.</p>
                         </div>
                         <strong id="profileLanguageCount" class="pill">0 selected</strong>
                     </div>
@@ -73,13 +73,14 @@
                 </section>
 
                 <div class="form-actions">
-                    <button type="submit" class="primary-button">Save profile</button>
-                    <a href="./chat.html" class="secondary-button link-button">Return to chat</a>
+                    <button type="submit" id="saveProfileBtn" class="primary-button">💾 Save Profile Changes</button>
+                    <a href="./chat.html" class="secondary-button link-button">💬 Return to Chat</a>
                 </div>
             </form>
         </section>
     </main>
 
+    <script src="./js/bg3d.js"></script>
     <script src="./js/profile.js"></script>
 </body>
 </html>

@@ -3,50 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PolyChat | Chat</title>
+    <title>PolyChat 3D | AI Workspace</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body class="chat-page">
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
     <div class="chat-shell">
-        <aside class="sidebar">
+        <aside id="chatSidebar" class="sidebar">
             <div class="sidebar-top">
                 <div>
-                    <p class="brand-kicker">PolyChat</p>
+                    <p class="brand-kicker">PolyChat 3D</p>
                     <h1>Conversations</h1>
                 </div>
-                <button id="newChatButton" class="primary-button small">New chat</button>
+                <button id="newChatButton" type="button" class="primary-button small">＋ New chat</button>
             </div>
 
             <label class="search-field">
                 <span class="sr-only">Search conversations</span>
-                <input id="conversationSearch" type="search" placeholder="Search your chat history">
+                <input id="conversationSearch" type="search" placeholder="🔍 Search your chat history...">
             </label>
 
             <div id="conversationList" class="conversation-list"></div>
+
+            <div id="memoryBox" class="sidebar-memory-box">
+                <h4>
+                    <span>🧠 Learned Memories</span>
+                    <span id="memoryCountBadge" class="pill" style="padding:2px 8px;font-size:0.72rem;">0</span>
+                </h4>
+                <div id="memoryTags" class="memory-tags">
+                    <span class="muted-copy" style="font-size:0.78rem;">Tell me your name, city, or interests!</span>
+                </div>
+            </div>
         </aside>
 
         <main class="chat-main">
             <header class="chat-header">
-                <div>
-                    <p class="eyebrow">Memory-aware multilingual assistant</p>
-                    <h2 id="chatTitle">Start a new conversation</h2>
+                <div class="chat-header-left">
+                    <button id="mobileMenuBtn" type="button" class="mobile-menu-btn" aria-label="Toggle conversations menu">☰</button>
+                    <div style="min-width:0;">
+                        <p class="eyebrow">✨ Memory-Aware Multilingual 3D Assistant</p>
+                        <h2 id="chatTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Start a new conversation</h2>
+                    </div>
                 </div>
 
                 <div class="header-actions">
                     <div class="language-inline">
-                        <label for="languageSelect">Reply language</label>
+                        <label for="languageSelect">Reply in</label>
                         <select id="languageSelect"></select>
                     </div>
 
                     <div class="profile-menu-wrapper">
-                        <button id="profileMenuButton" class="profile-trigger">
+                        <button id="profileMenuButton" type="button" class="profile-trigger">
                             <img id="headerAvatar" src="./images/default-avatar.svg" alt="Profile avatar">
                             <span id="headerName">Profile</span>
                         </button>
 
                         <div id="profileDropdown" class="profile-dropdown hidden">
-                            <a href="./profile.html">View profile</a>
-                            <button id="logoutButton" type="button">Logout</button>
+                            <a href="./profile.html">👤 Edit Profile</a>
+                            <button id="logoutButton" type="button">🚪 Logout</button>
                         </div>
                     </div>
                 </div>
@@ -56,25 +71,42 @@
 
             <section id="messagesPanel" class="messages-panel">
                 <div id="emptyState" class="empty-state">
-                    <h3>Ready when you are</h3>
-                    <p>
-                        Type or speak in any language. The chatbot will save each conversation and use the
-                        user's profile plus earlier chats for more relevant replies.
+                    <div class="empty-state-orb">🤖</div>
+                    <h3>Ready when you are!</h3>
+                    <p class="muted-copy">
+                        Type or speak in Hindi, English, or any of 48+ languages. PolyChat remembers your profile
+                        and past chats to deliver personalized, animated responses.
                     </p>
+                    <div class="quick-prompts">
+                        <button type="button" class="quick-prompt-chip" data-prompt="नमस्ते! आज आप मेरी क्या मदद कर सकते हैं?">🙏 नमस्ते! (Hindi)</button>
+                        <button type="button" class="quick-prompt-chip" data-prompt="What do you know about me from my profile and memory?">🧠 What do you remember about me?</button>
+                        <button type="button" class="quick-prompt-chip" data-prompt="Write a clean Python function example with explanation.">🐍 Python Code Example</button>
+                        <button type="button" class="quick-prompt-chip" data-prompt="Calculate 125 * 48 + 350">🧮 Solve Math: 125 × 48 + 350</button>
+                    </div>
                 </div>
             </section>
 
             <form id="composerForm" class="composer">
-                <textarea id="messageInput" rows="1" placeholder="Message PolyChat"></textarea>
+                <div class="composer-input-wrap">
+                    <textarea id="messageInput" rows="1" placeholder="Message PolyChat 3D... (Press Enter to send, Shift+Enter for new line)"></textarea>
+                    <div class="typing-live-pill">
+                        <span class="typing-wave"><i></i><i></i><i></i></span>
+                        <span>Typing</span>
+                    </div>
+                </div>
                 <div class="composer-actions">
-                    <button id="voiceButton" type="button" class="secondary-button">Voice input</button>
-                    <button id="speakerButton" type="button" class="secondary-button">Voice off</button>
-                    <button id="sendButton" type="submit" class="primary-button">Send</button>
+                    <span class="composer-hint">💡 Press <strong>Enter</strong> to send • <strong>Shift + Enter</strong> for newline</span>
+                    <div class="composer-buttons">
+                        <button id="voiceButton" type="button" class="secondary-button">🎙️ Voice Input</button>
+                        <button id="speakerButton" type="button" class="secondary-button">🔈 Voice Off</button>
+                        <button id="sendButton" type="submit" class="primary-button">Send ➤</button>
+                    </div>
                 </div>
             </form>
         </main>
     </div>
 
+    <script src="./js/bg3d.js"></script>
     <script src="./js/chat.js"></script>
 </body>
 </html>

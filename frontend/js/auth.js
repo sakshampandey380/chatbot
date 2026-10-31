@@ -9,10 +9,33 @@ const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 const registerLanguages = document.getElementById("registerLanguages");
 const languageCount = document.getElementById("languageCount");
+const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+const registerSubmitBtn = document.getElementById("registerSubmitBtn");
+
+const FALLBACK_LANGUAGES = [
+    { code: "en-US", label: "English" },
+    { code: "hi-IN", label: "Hindi" },
+    { code: "bn-BD", label: "Bengali" },
+    { code: "gu-IN", label: "Gujarati" },
+    { code: "mr-IN", label: "Marathi" },
+    { code: "pa-IN", label: "Punjabi" },
+    { code: "ta-IN", label: "Tamil" },
+    { code: "te-IN", label: "Telugu" },
+    { code: "ur-PK", label: "Urdu" },
+    { code: "es-ES", label: "Spanish" },
+    { code: "fr-FR", label: "French" },
+    { code: "de-DE", label: "German" },
+    { code: "ja-JP", label: "Japanese" },
+    { code: "ar-SA", label: "Arabic" },
+];
 
 const getApiUrl = (path) => `${API_ROOT}${path}`;
 const goToChat = () => {
-    window.location.href = "./chat.html";
+    if (window.PolyChat3D && typeof window.PolyChat3D.navigate === "function") {
+        window.PolyChat3D.navigate("./chat.html");
+    } else {
+        window.location.href = "./chat.html";
+    }
 };
 
 function showStatus(message, type = "error") {
@@ -40,14 +63,24 @@ function updateLanguageCount() {
 }
 
 function renderLanguageOptions(languages) {
+    const defaultPreselected = ["en-US", "hi-IN"];
     registerLanguages.innerHTML = languages.map((language) => `
         <label class="language-option">
-            <input type="checkbox" value="${language.code}">
+            <input type="checkbox" value="${language.code}" ${defaultPreselected.includes(language.code) ? "checked" : ""}>
             <span>${language.label}</span>
         </label>
     `).join("");
     registerLanguages.onchange = updateLanguageCount;
     updateLanguageCount();
+}
+
+function formatApiError(data) {
+    if (!data) return "Request failed.";
+    if (typeof data.detail === "string") return data.detail;
+    if (Array.isArray(data.detail) && data.detail.length) {
+        return data.detail.map((err) => err.msg || JSON.stringify(err)).join(", ");
+    }
+    return "Unable to complete request. Please check your details.";
 }
 
 async function request(path, payload) {
@@ -60,7 +93,7 @@ async function request(path, payload) {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-        throw new Error(data.detail || "Request failed.");
+        throw new Error(formatApiError(data));
     }
     return data;
 }
@@ -69,9 +102,9 @@ async function loadLanguages() {
     try {
         const response = await fetch(getApiUrl("/api/profile/languages"));
         const data = await response.json();
-        renderLanguageOptions(data.languages || []);
+        renderLanguageOptions(data.languages && data.languages.length ? data.languages : FALLBACK_LANGUAGES);
     } catch (error) {
-        showStatus("Unable to load language choices right now.");
+        renderLanguageOptions(FALLBACK_LANGUAGES);
     }
 }
 
@@ -92,16 +125,22 @@ loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearStatus();
     const formData = new FormData(loginForm);
+    const originalText = loginSubmitBtn.textContent;
+    loginSubmitBtn.disabled = true;
+    loginSubmitBtn.textContent = "⏳ Signing in...";
 
     try {
         const result = await request("/api/auth/login", {
-            identifier: formData.get("identifier"),
-            password: formData.get("password"),
+            identifier: String(formData.get("identifier") || "").trim(),
+            password: String(formData.get("password") || ""),
         });
         storeAuth(result);
-        goToChat();
+        showStatus("Welcome back! Launching 3D workspace...", "success");
+        setTimeout(goToChat, 250);
     } catch (error) {
         showStatus(error.message);
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtn.textContent = originalText;
     }
 });
 
@@ -112,30 +151,49 @@ registerForm.addEventListener("submit", async (event) => {
     const selectedLanguages = getSelectedLanguages(registerLanguages);
 
     if (selectedLanguages.length < 2) {
-        showStatus("Please choose at least two languages before registering.");
+        showStatus("Please select at least 2 default languages before registering.");
         return;
     }
+
+    const originalText = registerSubmitBtn.textContent;
+    registerSubmitBtn.disabled = true;
+    registerSubmitBtn.textContent = "⏳ Creating your account...";
 
     try {
         const result = await request("/api/auth/register", {
-            full_name: formData.get("full_name"),
-            username: formData.get("username"),
-            email: formData.get("email"),
-            password: formData.get("password"),
-            bio: formData.get("bio"),
+            full_name: String(formData.get("full_name") || "").trim() || null,
+            username: String(formData.get("username") || "").trim(),
+            email: String(formData.get("email") || "").trim(),
+            password: String(formData.get("password") || ""),
+            bio: String(formData.get("bio") || "").trim() || null,
             default_languages: selectedLanguages,
         });
         storeAuth(result);
-        goToChat();
+        showStatus("Account created! Entering 3D workspace...", "success");
+        setTimeout(goToChat, 250);
     } catch (error) {
         showStatus(error.message);
+        registerSubmitBtn.disabled = false;
+        registerSubmitBtn.textContent = originalText;
     }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem("polychat_token")) {
-        goToChat();
-        return;
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadLanguages();
+    const existingToken = localStorage.getItem("polychat_token");
+    if (existingToken) {
+        try {
+            const res = await fetch(getApiUrl("/api/auth/me"), {
+                headers: { Authorization: `Bearer ${existingToken}` },
+            });
+            if (res.ok) {
+                goToChat();
+                return;
+            }
+            localStorage.removeItem("polychat_token");
+            localStorage.removeItem("polychat_user");
+        } catch (_) {
+            // Stay on login page if server is unreachable
+        }
     }
-    loadLanguages();
 });

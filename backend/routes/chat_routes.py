@@ -1,12 +1,10 @@
-from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import desc, select
 from sqlalchemy.orm import Session, selectinload
 
 from backend.database.db import get_db
-from backend.database.models import ChatLog, Conversation, Message, User
+from backend.database.models import ChatLog, Conversation, Memory, Message, User, utc_now
 from backend.services.ai_service import ai_service
 from backend.services.memory_service import build_user_context, learn_from_message, search_past_context
 from backend.services.user_service import serialize_user
@@ -44,6 +42,15 @@ def serialize_conversation(conversation: Conversation) -> dict:
         "title": conversation.title,
         "started_at": conversation.started_at.isoformat(),
         "last_message_at": conversation.last_message_at.isoformat(),
+    }
+
+
+def serialize_memory(memory: Memory) -> dict:
+    return {
+        "id": memory.id,
+        "key": memory.memory_key,
+        "value": memory.memory_value,
+        "updated_at": memory.updated_at.isoformat(),
     }
 
 
@@ -105,6 +112,35 @@ def get_conversation(
     }
 
 
+@router.patch("/conversations/{conversation_id}")
+def rename_conversation(
+    conversation_id: int,
+    payload: ConversationPayload,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    conversation = get_conversation_or_404(db, conversation_id, current_user.id)
+    new_title = (payload.title or "").strip()[:180]
+    if not new_title:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Title cannot be empty.")
+    conversation.title = new_title
+    db.commit()
+    db.refresh(conversation)
+    return {"conversation": serialize_conversation(conversation)}
+
+
+@router.delete("/conversations/{conversation_id}")
+def delete_conversation(
+    conversation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    conversation = get_conversation_or_404(db, conversation_id, current_user.id)
+    db.delete(conversation)
+    db.commit()
+    return {"status": "deleted", "id": conversation_id}
+
+
 @router.post("/conversations/{conversation_id}/messages")
 def send_message(
     conversation_id: int,
@@ -114,6 +150,11 @@ def send_message(
 ):
     conversation = get_conversation_or_404(db, conversation_id, current_user.id)
     target_language = payload.language or (parse_languages(current_user.default_languages)[:1] or [None])[0]
+
+    prior_history = [
+        {"sender": msg.sender, "message": msg.message}
+        for msg in conversation.messages[-10:]
+    ]
 
     user_message = Message(
         conversation_id=conversation.id,
@@ -134,6 +175,7 @@ def send_message(
         message=payload.message.strip(),
         target_language=target_language,
         context=context,
+        history=prior_history,
     )
 
     assistant_message = Message(
@@ -145,7 +187,7 @@ def send_message(
     )
     db.add(assistant_message)
     db.add(ChatLog(user_id=current_user.id, message=payload.message.strip(), response=reply_text))
-    conversation.last_message_at = datetime.utcnow()
+    conversation.last_message_at = utc_now()
     db.commit()
     db.refresh(conversation)
     db.refresh(user_message)
@@ -157,6 +199,31 @@ def send_message(
     }
 
 
+@router.get("/memories")
+def list_memories(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    memories = db.scalars(
+        select(Memory).where(Memory.user_id == current_user.id).order_by(desc(Memory.updated_at))
+    ).all()
+    return {"memories": [serialize_memory(item) for item in memories]}
+
+
+@router.delete("/memories/{memory_id}")
+def delete_memory(
+    memory_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    memory = db.scalar(select(Memory).where(Memory.id == memory_id, Memory.user_id == current_user.id))
+    if memory is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Memory not found.")
+    db.delete(memory)
+    db.commit()
+    return {"status": "deleted", "id": memory_id}
+
+
 @router.get("/search")
 def search_history(
     q: str = Query("", max_length=200),
@@ -164,3 +231,4 @@ def search_history(
     current_user: User = Depends(get_current_user),
 ):
     return {"results": search_past_context(db, current_user.id, q, limit=10)}
+

@@ -9,6 +9,7 @@ if (!token) {
 }
 
 const profileForm = document.getElementById("profileForm");
+const saveProfileBtn = document.getElementById("saveProfileBtn");
 const profileLanguages = document.getElementById("profileLanguages");
 const profileLanguageCount = document.getElementById("profileLanguageCount");
 const profileStatus = document.getElementById("profileStatus");
@@ -47,7 +48,11 @@ function clearStatus() {
 function clearAuth() {
     localStorage.removeItem("polychat_token");
     localStorage.removeItem("polychat_user");
-    window.location.href = "./index.html";
+    if (window.PolyChat3D && typeof window.PolyChat3D.navigate === "function") {
+        window.PolyChat3D.navigate("./index.html");
+    } else {
+        window.location.href = "./index.html";
+    }
 }
 
 async function api(path, options = {}) {
@@ -64,7 +69,8 @@ async function api(path, options = {}) {
         return null;
     }
     if (!response.ok) {
-        throw new Error(data.detail || "Request failed.");
+        const msg = typeof data.detail === "string" ? data.detail : "Request failed.";
+        throw new Error(msg);
     }
     return data;
 }
@@ -95,9 +101,9 @@ function fillProfile(user) {
     profileForm.elements.email.value = user.email || "";
     profileForm.elements.bio.value = user.bio || "";
     createdAtInput.value = new Date(user.created_at).toLocaleString();
-    profileHeaderName.textContent = user.full_name || user.username || "Profile settings";
-    profileNameCard.textContent = user.full_name || user.username || "Your profile";
-    profileCreatedAt.textContent = `Created ${new Date(user.created_at).toLocaleDateString()}`;
+    profileHeaderName.textContent = user.full_name || user.username || "Profile Settings";
+    profileNameCard.textContent = user.full_name || user.username || "Your Profile";
+    profileCreatedAt.textContent = `Member since ${new Date(user.created_at).toLocaleDateString()}`;
     profilePreview.src = getAssetUrl(user.profile_pic);
     profileHeaderAvatar.src = getAssetUrl(user.profile_pic);
     renderLanguageOptions(user.default_languages || []);
@@ -134,8 +140,14 @@ profileForm.addEventListener("submit", async (event) => {
     clearStatus();
     const selectedLanguages = getSelectedLanguages();
     if (selectedLanguages.length < 2) {
-        showStatus("Please keep at least two default languages selected.");
+        showStatus("Please keep at least 2 default languages selected.");
         return;
+    }
+
+    const originalText = saveProfileBtn ? saveProfileBtn.textContent : "Save Profile";
+    if (saveProfileBtn) {
+        saveProfileBtn.disabled = true;
+        saveProfileBtn.textContent = "⏳ Saving changes...";
     }
 
     try {
@@ -146,10 +158,10 @@ profileForm.addEventListener("submit", async (event) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                full_name: profileForm.elements.full_name.value,
-                username: profileForm.elements.username.value,
-                email: profileForm.elements.email.value,
-                bio: profileForm.elements.bio.value,
+                full_name: profileForm.elements.full_name.value.trim() || null,
+                username: profileForm.elements.username.value.trim(),
+                email: profileForm.elements.email.value.trim(),
+                bio: profileForm.elements.bio.value.trim() || null,
                 default_languages: selectedLanguages,
             }),
         });
@@ -158,10 +170,15 @@ profileForm.addEventListener("submit", async (event) => {
         }
         fillProfile(data.user);
         localStorage.setItem("polychat_user", JSON.stringify(data.user));
-        showStatus("Profile saved successfully.", "success");
+        showStatus("✨ Profile saved successfully!", "success");
         profilePhotoInput.value = "";
     } catch (error) {
         showStatus(error.message);
+    } finally {
+        if (saveProfileBtn) {
+            saveProfileBtn.disabled = false;
+            saveProfileBtn.textContent = originalText;
+        }
     }
 });
 
